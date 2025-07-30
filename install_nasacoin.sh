@@ -14,7 +14,7 @@ sudo apt install -y \
 
 # Clone repo
 echo "📦 Cloning NASA Coin source..."
-git clone https://github.com/wbaker7702/nasacoin-core.git
+git clone https://github.com/YOUR-USERNAME/nasacoin-core.git
 cd nasacoin-core
 
 # Build NASA Coin
@@ -37,12 +37,35 @@ txindex=1
 listen=1
 EOF
 
-# Start daemon
-echo "🚀 Starting NASA Coin daemon..."
-./src/nasacoind -daemon
+# Move binaries to /usr/local/bin for global access
+sudo cp src/nasacoind /usr/local/bin/
+sudo cp src/nasacoin-cli /usr/local/bin/
+sudo cp src/nasacoin-tx /usr/local/bin/
 
-sleep 5
-echo "📡 Blockchain info:"
-./src/nasacoin-cli getblockchaininfo
+# Create systemd service
+echo "📡 Creating systemd service..."
+cat <<EOF | sudo tee /etc/systemd/system/nasacoind.service
+[Unit]
+Description=NASA Coin Node
+After=network.target
 
-echo "✅ NASA Coin is running!"
+[Service]
+ExecStart=/usr/local/bin/nasacoind -daemon
+ExecStop=/usr/local/bin/nasacoin-cli stop
+User=$USER
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+# Reload systemd and start service
+sudo systemctl daemon-reexec
+sudo systemctl daemon-reload
+sudo systemctl enable nasacoind
+sudo systemctl start nasacoind
+
+echo "✅ NASA Coin service installed and started!"
+sleep 3
+nasacoin-cli getblockchaininfo
+
