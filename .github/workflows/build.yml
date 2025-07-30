@@ -1,0 +1,40 @@
+name: Build NASA Coin
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build-linux:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: ⬇️ Checkout repo
+        uses: actions/checkout@v3
+
+      - name: ⚙️ Set up dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y \
+            build-essential libtool autotools-dev automake pkg-config \
+            libssl-dev libevent-dev bsdmainutils libboost-all-dev \
+            libdb-dev libdb++-dev git
+
+      - name: 🔧 Build NASA Coin
+        run: |
+          ./autogen.sh
+          ./configure
+          make -j$(nproc)
+
+      - name: 📦 Upload binaries (nasacoind & nasacoin-cli)
+        uses: actions/upload-artifact@v4
+        with:
+          name: nasacoin-binaries
+          path: |
+            src/nasacoind
+            src/nasacoin-cli
+            src/nasacoin-tx
