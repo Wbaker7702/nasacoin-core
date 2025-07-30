@@ -25,7 +25,7 @@ sudo apt update
 sudo apt install build-essential libtool autotools-dev automake pkg-config libssl-dev \
 libevent-dev bsdmainutils libboost-all-dev libdb-dev libdb++-dev
 
-git clone https://github.com/YOUR-USERNAME/nasacoin-core.git
+git clone https://github.com/wbaker7702/nasacoin-core.git
 cd nasacoin-core
 ./autogen.sh
 ./configure
